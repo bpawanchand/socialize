@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const request = require('request');
+const config = require('config');
 const Profile = require('../model/profile');
 const User = require('../model/User');
 const { check, validationResult } = require('express-validator');
@@ -216,5 +218,50 @@ router.put(
     }
   }
 );
+
+//  @route:   DELETE /exp/:exp_id
+//  @desc:    Delete User Experience
+//  @access:  Private
+
+router.delete('/exp/:exp_id', auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+    const removeIndex = profile.experience
+      .map(item => item.id)
+      .indexOf(req.params.exp_id);
+    profile.experience.splice(removeIndex, 1);
+    await profile.save();
+    res.json(profile);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ errors: [{ msg: 'Server Error' }] });
+  }
+});
+
+//  @route:   GET /github/:username
+//  @desc:    GET user Profiles
+//  @access:  Public
+router.get('/github/:username', async (req, res) => {
+  try {
+    const options = {
+      uri: `https://api.github.com/users/${
+        req.params.username
+      }/repos?per_page=5&sort=asc&client_id =${config.get(
+        'githubclient'
+      )}&client_secret=${config.get('githubsecret')}`,
+      method: 'GET',
+      headers: { 'user-agent': 'node.js' }
+    };
+    request(options, (err, response, body) => {
+      if (err) console.error(err.message);
+      if (response.statusCode !== 200)
+        res.status(400).json({ errrors: [{ msg: 'Server Error' }] });
+      res.json(JSON.parse(body));
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ errors: [{ msg: 'Server Error' }] });
+  }
+});
 
 module.exports = router;

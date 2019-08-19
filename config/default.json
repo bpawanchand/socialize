@@ -1,4 +1,6 @@
 {
   "dbURI": "mongodb://localhost:27017/MERN",
-  "jwtToken": "pavanmysecrettoken"
+  "jwtToken": "pavanmysecrettoken",
+  "githubclient": "5d5a3449f714f11e5e1181a4",
+  "githubsecret": "4c65929718ab37c8e8ea0867d1d4fa107dcb69d6"
 }
