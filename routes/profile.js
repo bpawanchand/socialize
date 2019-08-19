@@ -198,8 +198,6 @@ router.put(
         if (req.body[index].desc) newExp.desc = req.body[index].desc;
         if (req.body[index].from) newExp.from = req.body[index].from;
         if (req.body[index].to) newExp.to = req.body[index].to;
-        // console.log(req.body[index].from);
-        // console.log(new dateformat(req.body[index].from));
         //  Find the exact profile by User ID
         let profile = await Profile.findOne({ user: req.user.id });
         if (!profile) {
@@ -207,7 +205,6 @@ router.put(
             .status(400)
             .json({ errors: [{ msg: 'Profile Not Found...' }] });
         }
-        console.log(newExp);
         profile.experience.unshift(newExp);
         //  Update experince profile
         await profile.save();
